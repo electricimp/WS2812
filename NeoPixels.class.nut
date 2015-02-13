@@ -1,7 +1,7 @@
 class NeoPixels {
 
 	// Driver for the World Semi WS2812 - aka Adafruit NeoPixel
-	// By Matt Haines (@beardedinventor)
+	// By Matt Haines (@beardedinventor) and Tom Byrne (@ersatzavian)
 
 	// See https://electricimp.com/docs/resources/neopixels/
 
