@@ -20,7 +20,7 @@ Because Nexpixels require 5V logic, you will need to shift your logic level to 5
 ## Instantiating the class
 Instantiate the NeoPixels class with a pre-configured SPI object (see example below), and the number of pixels that are connected. The SPI object must be configured at 7500 kHz, and have the MSB_FIRST flag set:
 
-```
+```squirrel
 // configure the SPI bus
 hardware.spi257.configure(MSB_FIRST, 7500);
 // Instantiate an array of 8 NeoPixels
@@ -33,7 +33,7 @@ The NeoPixels class keeps an internal frame that is only output to the pixel arr
 ### NeoPixel.writePixel(pixelID, [r,g,b])
 The **writePixel** method changes the colour of a particular pixel in the frame buffer - this will not be written to the hardware until a call to **writeFrame()** is made:
 
-```
+```squirrel
 // Change the colour of some pixels in the frame buffer
 pixels.writePixel(0, [255, 0, 0]); // write full red to the first pixel
 pixels.writePixel(1, [127, 0, 0]); // write half red to the second pixel
@@ -45,7 +45,8 @@ pixels.writeFrame();
 
 ### NeoPixels.clearFrame()
 The **clearFrame** method will clear the frame buffer (set ALL pixels to [0,0,0]) - this will not be written to the hardware until a call to **writeFrame()** is made:
-```
+
+```squirrel
 // Set all pixels to [0,0,0] in the frame buffer
 pixels.clearFrame();
 // Write the frame buffer to the hardware
