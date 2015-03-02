@@ -37,7 +37,7 @@ pixels <- NeoPixels(hardware.spi257, 8)
 
 The NeoPixels class keeps an internal frame that is only output to the pixel array when the **writeFrame()** method is called. As a result, changing the pixel strip takes two steps: writing values to the frame, and writing the frame to the SPI bus.
 
-### writePixel(*pixelID*, *pixelColor*)
+### writePixel(*pixelAddress*, *pixelColor*)
 
 The **writePixel()** method changes the colour of a particular pixel in the frame buffer. However, this will not be written to the hardware until a call to **writeFrame()** is made. The method takes two parameters: the address of the NeoPixel that you are changing (its position in the sequence of LEDs, an integer) and the color it should present. The color is passed as an array of three integers, one each for the red, green and blue components. Values range from 0 to 255.
 
