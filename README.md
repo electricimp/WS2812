@@ -33,7 +33,7 @@ hardware.spi257.configure(MSB_FIRST, 7500)
 pixels <- NeoPixels(hardware.spi257, 8)
 ```
 
-### Writing Pixels
+### Class Methods
 
 The NeoPixels class keeps an internal frame that is only output to the pixel array when the **writeFrame()** method is called. As a result, changing the pixel strip takes two steps: writing values to the frame, and writing the frame to the SPI bus.
 
