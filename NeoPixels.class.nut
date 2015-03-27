@@ -13,39 +13,32 @@ class NeoPixels {
 	// when instantiated, the neopixel class will fill this array with blobs to
 	// represent the waveforms to send the numbers 0 to 255. This allows the blobs to be
 	// copied in directly, instead of being built for each pixel - which makes the class faster.
-
 	bits            = null;
 
 	// Like bits, this blob holds the waveform to send the color [0,0,0], to clear pixels faster
-
-	clearblob       = blob(12);
+	clearblob       = null;
 
 	// private variables passed into the constructor
-
 	spi             = null; // imp SPI interface (pre-configured)
 	frameSize       = null; // number of pixels per frame
 	frame           = null; // a blob to hold the current frame
 
 	// _spi - A configured spi (MSB_FIRST, 7.5MHz)
 	// _frameSize - Number of Pixels per frame
-
 	constructor(_spi, _frameSize) {
-		this.spi = _spi;
-		this.frameSize = _frameSize;
-		this.frame = blob(frameSize*BYTESPERPIXEL + 1);
-		this.frame[frameSize*BYTESPERPIXEL] = 0;
+		spi = _spi;
+		frameSize = _frameSize;
+		frame = blob(frameSize*BYTESPERPIXEL + 1);
+		frame[frameSize*BYTESPERPIXEL] = 0;
 
 		// prepare the bits array and the clearblob blob
-
 		initialize();
-
 		clearFrame();
 		writeFrame();
 	}
 
 	// fill the array of representative 1-wire waveforms.
 	// done by the constructor at instantiation.
-
 	function initialize() {
 		// fill the bits array first
 
@@ -64,6 +57,7 @@ class NeoPixels {
 		}
 
 		// now fill the clearblob
+		clearblob = blob(BYTESPERPIXEL);
 		for(local j = 0; j < BYTESPERPIXEL; j++) {
 			clearblob.writen(ZERO, 'b');
 		}
