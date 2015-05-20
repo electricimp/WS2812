@@ -1,8 +1,8 @@
 // Copyright (c) 2015 Electric Imp
 // This file is licensed under the MIT License
 // http://opensource.org/licenses/MIT
-class NeoPixels {
-	// This class uses SPI to emulate the newpixels' one-wire protocol.
+class WS2812 {
+	// This class uses SPI to emulate the WS2812s' one-wire protocol.
 	// This requires one byte per bit to send data at 7.5 MHz via SPI.
 	// These consts define the "waveform" to represent a zero or one
 
@@ -10,7 +10,7 @@ class NeoPixels {
 	static ONE             = 0xF8;
 	static BYTESPERPIXEL   = 24;
 
-	// when instantiated, the neopixel class will fill this array with blobs to
+	// when instantiated, the WS2812 class will fill this array with blobs to
 	// represent the waveforms to send the numbers 0 to 255. This allows the blobs to be
 	// copied in directly, instead of being built for each pixel - which makes the class faster.
 	bits            = null;
