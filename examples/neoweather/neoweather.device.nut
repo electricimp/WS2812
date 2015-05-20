@@ -4,11 +4,11 @@
 // Uses SPI to emulate 1-wire
 // http://learn.adafruit.com/adafruit-neopixel-uberguide/advanced-coding
  
-#require "Neopixels.class.nut:1.0.0"
+#require "WS2812.class.nut:1.0.0"
  
 /* CONSTS AND GLOBALS --------------------------------------------------------*/
 
-class NeoWeather extends NeoPixels {
+class NeoWeather extends WS2812 {
     
     /* control parameter for raindrop and thunder effects */
     REFRESHPERIOD       = 0.05; // normal effects refresh 20 times per second
