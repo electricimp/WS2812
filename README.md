@@ -9,7 +9,7 @@ Some example hardware that uses the WS2812 or WS2812B:
 * [30 LED - 1m strip](http://www.adafruit.com/products/1376)
 * [NeoPixel Stick](http://www.adafruit.com/products/1426)
 
-**To add this library to your project, add** `#require "WS2812.class.nut:1.0.0"` **to the top of your device code**
+**To add this library to your project, add** `#require "WS2812.class.nut:1.0.1"` **to the top of your device code**
 
 ## Hardware
 
