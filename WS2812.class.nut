@@ -5,6 +5,8 @@ class WS2812 {
 	// This class uses SPI to emulate the WS2812s' one-wire protocol.
 	// This requires one byte per bit to send data at 7.5 MHz via SPI.
 	// These consts define the "waveform" to represent a zero or one
+	
+	static version = [1,0,0]
 
 	static ZERO            = 0xC0;
 	static ONE             = 0xF8;
