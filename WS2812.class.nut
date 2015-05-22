@@ -8,7 +8,7 @@ class WS2812
 	// This requires one byte per bit to send data at 7.5 MHz via SPI.
 	// These consts define the "waveform" to represent a zero or one
 	
-	static version = [1,0,0];
+	static version = [1,0,1];
 
 	static ZERO            = 0xC0;
 	static ONE             = 0xF8;
