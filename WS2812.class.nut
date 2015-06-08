@@ -38,12 +38,26 @@ class WS2812 {
         _frame = blob(_frameSize * BYTES_PER_PIXEL + 1);
         _frame[_frameSize * BYTES_PER_PIXEL] = 0;
 
-        // Prepare the bits array and the clearblob blob
+        // Fill the bits array first
+        _bits = array(256);
 
-        _initialize();
+        // Used in constructing the array
+        local bytesPerColor = BYTES_PER_PIXEL / 3;
 
-        // Zero the LED array
+        for (local i = 0; i < 256; i++) {
+            local valblob = blob(bytesPerColor);
+            valblob.writen((i & 0x80) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x40) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x20) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x10) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x08) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x04) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x02) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x01) ? ONE:ZERO,'b');
+            _bits[i] = valblob;
+        }
 
+        // Turn all pixels off
         fill([0,0,0]);
         draw();
     }
@@ -54,8 +68,10 @@ class WS2812 {
     //
     // NOTE: set(index, color) replaces v1.x.x's writePixel(p, color) method
     function set(index, color) {
-        assert(index >= 0);
-        assert(index < _frameSize);
+        assert(index >= 0 && index < _frameSize);
+        assert(color[0] >= 0 && color[0] <= 255);
+        assert(color[1] >= 0 && color[1] <= 255);
+        assert(color[2] >= 0 && color[2] <= 255);
 
         _frame.seek(index * BYTES_PER_PIXEL);
 
@@ -67,7 +83,7 @@ class WS2812 {
 
 
     // Sets the frame buffer (or a portion of the frame buffer)
-    // to the specified colour, but does not write it to the pixel strip
+    // to the specified color, but does not write it to the pixel strip
     //
     // NOTE: fill([0,0,0]) replaces v1.x.x's clear() method
     function fill(color, start=null, end=null) {
@@ -78,6 +94,9 @@ class WS2812 {
         // Make sure we're not out of bounds
         assert(start >= 0 && start < _frameSize);
         assert(end >=0 && end < _frameSize)
+        assert(color[0] >= 0 && color[0] <= 255);
+        assert(color[1] >= 0 && color[1] <= 255);
+        assert(color[2] >= 0 && color[2] <= 255);
 
         // Flip start & end if required
         if (start > end) {
@@ -104,29 +123,5 @@ class WS2812 {
     // NOTE: draw() replaces v1.x.x's writeFrame() method
     function draw() {
         _spi.write(_frame);
-    }
-
-    //-------------------- PRIVATE METHODS --------------------//
-
-    // Fill the array of representative 1-wire waveforms,
-    // done by the constructor at instantiation
-
-    function _initialize() {
-        // Fill the bits array first
-
-        _bits = array(256);
-
-        for (local i = 0; i < 256; i++) {
-            local valblob = blob(BYTES_PER_PIXEL / 3);
-            valblob.writen((i & 0x80) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x40) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x20) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x10) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x08) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x04) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x02) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x01) ? ONE:ZERO,'b');
-            _bits[i] = valblob;
-        }
     }
 }
