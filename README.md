@@ -9,8 +9,6 @@ Some example hardware that uses the WS2812 or WS2812B:
 * [30 LED - 1m strip](http://www.adafruit.com/products/1376)
 * [NeoPixel Stick](http://www.adafruit.com/products/1426)
 
-**To add this library to your project, add** `#require "WS2812.class.nut:2.0.0"` **to the top of your device code**
-
 ## Hardware
 
 WS2812s require a 5V power supply and logic, and each pixel can draw up to 60mA when displaying white in full brightness, so be sure to size your power supply appropriatly. Undersized power supplies (lower voltages and/or insufficent current) can cause glitches and/or failure to produce and light at all.
@@ -21,7 +19,7 @@ Because WS2812s require 5V logic, you will need to shift your logic level to 5V.
 
 ## Class Usage
 
-### Constructor
+### constructor(spiBus, numPixels)
 
 Instantiate the class with a pre-configured SPI object and the number of pixels that are connected. The SPI object must be configured at 7500kHz and have the *MSB_FIRST* flag set:
 
@@ -32,12 +30,9 @@ Instantiate the class with a pre-configured SPI object and the number of pixels 
 spi <- hardware.spi257;
 spi.configure(MSB_FIRST, 7500);
 
+// Instantiate LED array with 5 pixels
 pixels <- WS2812(spi, 5);
 ```
-
-### Class Methods
-
-The WS2812 class keeps an internal frame that is only output to the pixel array when the **writeFrame()** method is called. As a result, changing the pixel strip takes two steps: writing values to the frame, and writing the frame to the SPI bus.
 
 ### set(*pixelAddress, color*)
 
