@@ -2,121 +2,125 @@
 // This file is licensed under the MIT License
 // http://opensource.org/licenses/MIT
 
-class WS2812 
-{
-	// This class uses SPI to emulate the WS2812s' one-wire protocol.
-	// This requires one byte per bit to send data at 7.5 MHz via SPI.
-	// These consts define the "waveform" to represent a zero or one
-	
-	static version = [1,0,1];
+class WS2812 {
+    // This class uses SPI to emulate the WS2812s' one-wire protocol.
+    // This requires one byte per bit to send data at 7.5 MHz via SPI.
+    // These consts define the "waveform" to represent a zero or one
 
-	static ZERO            = 0xC0;
-	static ONE             = 0xF8;
-	static BYTESPERPIXEL   = 24;
+    static version = [2,0,0];
 
-	// When instantiated, the WS2812 class will fill this array with blobs to
-	// represent the waveforms to send the numbers 0 to 255. This allows the blobs to be
-	// copied in directly, instead of being built for each pixel - which makes the class faster.
-	
-	_bits            = null;
+    static ZERO            = 0xC0;
+    static ONE             = 0xF8;
+    static BYTES_PER_PIXEL   = 24;
 
-	// Like bits, this blob holds the waveform to send the color [0,0,0], to clear pixels faster.
-	
-	_clearblob       = null;
+    // When instantiated, the WS2812 class will fill this array with blobs to
+    // represent the waveforms to send the numbers 0 to 255. This allows the blobs to be
+    // copied in directly, instead of being built for each pixel - which makes the class faster.
 
-	// Private variables passed into the constructor
-	
-	_spi             = null;  // imp SPI interface (pre-configured)
-	_frameSize       = null;  // number of pixels per frame
-	_frame           = null;  // a blob to hold the current frame
+    _bits            = null;
 
-	// Parameters:
-	//    spi          A configured spi (MSB_FIRST, 7.5MHz)
-	//    frameSize    Number of Pixels per frame
-	
-	constructor(spiBus, frameSize) 
-	{
-		_spi = spiBus;
-		_frameSize = frameSize;
-		_frame = blob(_frameSize * BYTESPERPIXEL + 1);
-		_frame[_frameSize * BYTESPERPIXEL] = 0;
+    // Private variables passed into the constructor
 
-		// Prepare the bits array and the clearblob blob
-		
-		_initialize();
-		
-		// Zero the LED array
-		
-		clearFrame();
-		writeFrame();
-	}
+    _spi             = null;  // imp SPI interface (pre-configured)
+    _frameSize       = null;  // number of pixels per frame
+    _frame           = null;  // a blob to hold the current frame
 
-	// ------- PUBLIC FUNCTIONS -------
+    // Parameters:
+    //    spi          A pre-configured SPI bus (MSB_FIRST, 7500)
+    //    frameSize    Number of Pixels per frame
 
-	// Sets a pixel in the frame buffer
-	// but does not write it to the pixel strip
-	// color is an array of the form [r, g, b]
+    constructor(spiBus, frameSize)
+    {
+        // spiBus must be configured
+        _spi = spiBus;
 
-	function writePixel(p, color) 
-	{
-		_frame.seek(p * BYTESPERPIXEL);
+        _frameSize = frameSize;
+        _frame = blob(_frameSize * BYTES_PER_PIXEL + 1);
+        _frame[_frameSize * BYTES_PER_PIXEL] = 0;
 
-		// Red and green are swapped for some reason, so swizzle them back
+        // Prepare the bits array and the clearblob blob
 
-		_frame.writeblob(_bits[color[1]]);
-		_frame.writeblob(_bits[color[0]]);
-		_frame.writeblob(_bits[color[2]]);
-	}
+        _initialize();
 
-	// Clears the frame buffer
-	// but does not write it to the pixel strip
+        // Zero the LED array
 
-	function clearFrame() 
-	{
-		_frame.seek(0);
-		for (local p = 0 ; p < _frameSize ; p++) _frame.writeblob(_clearblob);
-	}
+        fill([0,0,0]);
+        draw();
+    }
 
-	// Writes the frame buffer to the pixel strip
-	// ie - this function changes the pixel strip
+    // ------- PUBLIC FUNCTIONS -------
 
-	function writeFrame() 
-	{
-		_spi.write(_frame);
-	}
-	
-	// ------ PRIVATE METHODS - DO NOT CALL DIRECTLY ------
-	
-	// Fill the array of representative 1-wire waveforms,
-	// done by the constructor at instantiation
-	
-	function _initialize() 
-	{
-		// Fill the bits array first
+    // Sets a pixel in the buffer
+    //   p - the pixel (0 <= p < _frameSize)
+    //   color - [r,g,b] (0 <= r,g,b <= 255)
+    function set(p, color) {
+        assert(p >= 0);
+        assert(p < _frameSize);
 
-		_bits = array(256);
-		
-		for (local i = 0; i < 256; i++) 
-		{
-			local valblob = blob(BYTESPERPIXEL / 3);
-			valblob.writen((i & 0x80) ? ONE:ZERO,'b');
-			valblob.writen((i & 0x40) ? ONE:ZERO,'b');
-			valblob.writen((i & 0x20) ? ONE:ZERO,'b');
-			valblob.writen((i & 0x10) ? ONE:ZERO,'b');
-			valblob.writen((i & 0x08) ? ONE:ZERO,'b');
-			valblob.writen((i & 0x04) ? ONE:ZERO,'b');
-			valblob.writen((i & 0x02) ? ONE:ZERO,'b');
-			valblob.writen((i & 0x01) ? ONE:ZERO,'b');
-			_bits[i] = valblob;
-		}
+        _frame.seek(p * BYTES_PER_PIXEL);
 
-		// Now fill the clearblob
-		
-		_clearblob = blob(BYTESPERPIXEL);
-		
-		for (local j = 0 ; j < BYTESPERPIXEL ; j++) 
-		{
-			_clearblob.writen(ZERO, 'b');
-		}
-	}
+        // Red and green are swapped for some reason, so swizzle them back
+        _frame.writeblob(_bits[color[1]]);
+        _frame.writeblob(_bits[color[0]]);
+        _frame.writeblob(_bits[color[2]]);
+    }
+
+
+    // Clears the frame buffer
+    // but does not write it to the pixel strip
+    function fill(color, start=null, end=null) {
+        // Set default values
+        if (start == null) { start = 0; }
+        if (end == null) { end = _frameSize - 1; }
+
+        // Make sure we're not out of bounds
+        assert(start >= 0 && start < _frameSize);
+        assert(end >=0 && end < _frameSize)
+
+        // Flip start & end if required
+        if (start > end) {
+            local temp = start;
+            start = end;
+            end = temp;
+        }
+
+        // Create a blob for the color
+        local colorBlob = blob(BYTES_PER_PIXEL);
+        colorBlob.writeblob(_bits[color[1]]);
+        colorBlob.writeblob(_bits[color[0]]);
+        colorBlob.writeblob(_bits[color[2]]);
+
+
+        _frame.seek(start*BYTES_PER_PIXEL);
+        for (local p = start ; p <= end ; p++) _frame.writeblob(colorBlob);
+    }
+
+    // Writes the frame to the pixel strip
+    function draw() {
+        _spi.write(_frame);
+    }
+
+    //-------------------- PRIVATE METHODS --------------------//
+
+    // Fill the array of representative 1-wire waveforms,
+    // done by the constructor at instantiation
+
+    function _initialize() {
+        // Fill the bits array first
+
+        _bits = array(256);
+
+        for (local i = 0; i < 256; i++) {
+            local valblob = blob(BYTES_PER_PIXEL / 3);
+            valblob.writen((i & 0x80) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x40) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x20) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x10) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x08) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x04) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x02) ? ONE:ZERO,'b');
+            valblob.writen((i & 0x01) ? ONE:ZERO,'b');
+            _bits[i] = valblob;
+        }
+    }
 }
