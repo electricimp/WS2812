@@ -34,9 +34,9 @@ spi.configure(MSB_FIRST, 7500);
 pixels <- WS2812(spi, 5);
 ```
 
-### set(*pixelAddress, color*)
+### set(*index, color*)
 
-The *set* method changes the colour of a particular pixel in the frame buffer. The color is passed as as an arry of three integers between 0 and 255 representing `[red, green, blue]`.
+The *set* method changes the colour of a particular pixel in the frame buffer. The color is passed as as an array of three integers between 0 and 255 representing `[red, green, blue]`.
 
 NOTE: The set method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
 
@@ -54,7 +54,9 @@ pixels.draw();
 
 ### fill(*color, [start], [end]*)
 
-The *fill* methods sets all pixels in the specified range to the desired colour. If no range is selected, the entire frame will be filled with the specified colour:
+The *fill* methods sets all pixels in the specified range to the desired colour. If no range is selected, the entire frame will be filled with the specified colour.
+
+NOTE: The set method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
 
 ```squirrel
 // Turn all LEDs off

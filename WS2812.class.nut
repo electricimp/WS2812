@@ -51,13 +51,13 @@ class WS2812 {
     // ------- PUBLIC FUNCTIONS -------
 
     // Sets a pixel in the buffer
-    //   p - the pixel (0 <= p < _frameSize)
+    //   index - the index of the pixel (0 <= index < _frameSize)
     //   color - [r,g,b] (0 <= r,g,b <= 255)
-    function set(p, color) {
-        assert(p >= 0);
-        assert(p < _frameSize);
+    function set(index, color) {
+        assert(index >= 0);
+        assert(index < _frameSize);
 
-        _frame.seek(p * BYTES_PER_PIXEL);
+        _frame.seek(index * BYTES_PER_PIXEL);
 
         // Red and green are swapped for some reason, so swizzle them back
         _frame.writeblob(_bits[color[1]]);
@@ -92,7 +92,9 @@ class WS2812 {
 
 
         _frame.seek(start*BYTES_PER_PIXEL);
-        for (local p = start ; p <= end ; p++) _frame.writeblob(colorBlob);
+        for (local index = start ; index <= end ; index++) {
+            _frame.writeblob(colorBlob);
+        }
     }
 
     // Writes the frame to the pixel strip
