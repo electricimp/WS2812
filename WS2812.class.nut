@@ -86,9 +86,9 @@ class WS2812 {
     // to the specified color, but does not write it to the pixel strip
     //
     // NOTE: fill([0,0,0]) replaces v1.x.x's clear() method
-    function fill(color, start=null, end=null) {
-        // Set default values
-        if (start == null) { start = 0; }
+    function fill(color, start=0, end=null) {
+        // we can't default to _frameSize -1, so we
+        // default to null and set to _frameSize - 1
         if (end == null) { end = _frameSize - 1; }
 
         // Make sure we're not out of bounds
