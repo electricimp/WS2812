@@ -57,7 +57,7 @@ pixels.set(4, [127,0,0]);
 pixels.draw();
 ```
 
-### fill(color [, start, end])
+### fill(*color, [start], [end]*)
 
 The *fill* methods sets all pixels in the specified range to the desired colour. If no range is selected, the entire frame will be filled with the specified colour:
 
