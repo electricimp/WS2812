@@ -29,8 +29,7 @@ class WS2812 {
     //    spi          A pre-configured SPI bus (MSB_FIRST, 7500)
     //    frameSize    Number of Pixels per frame
 
-    constructor(spiBus, frameSize)
-    {
+    constructor(spiBus, frameSize) {
         // spiBus must be configured
         _spi = spiBus;
 
