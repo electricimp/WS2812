@@ -17,7 +17,7 @@ class WS2812 {
     // represent the waveforms to send the numbers 0 to 255. This allows the blobs to be
     // copied in directly, instead of being built for each pixel - which makes the class faster.
 
-    _bits            = null;
+    static _bits     = array(256);
 
     // Private variables passed into the constructor
 
@@ -38,23 +38,24 @@ class WS2812 {
         _frame = blob(_frameSize * BYTES_PER_PIXEL + 1);
         _frame[_frameSize * BYTES_PER_PIXEL] = 0;
 
-        // Fill the bits array first
-        _bits = array(256);
-
-        // Used in constructing the array
+        // Used in constructing the _bits array
         local bytesPerColor = BYTES_PER_PIXEL / 3;
 
-        for (local i = 0; i < 256; i++) {
-            local valblob = blob(bytesPerColor);
-            valblob.writen((i & 0x80) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x40) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x20) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x10) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x08) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x04) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x02) ? ONE:ZERO,'b');
-            valblob.writen((i & 0x01) ? ONE:ZERO,'b');
-            _bits[i] = valblob;
+        // Fill the _bits array if required
+        // (Multiple instance of WS2812 will only initialize it once)
+        if (_bits[0] == null) {
+            for (local i = 0; i < 256; i++) {
+                local valblob = blob(bytesPerColor);
+                valblob.writen((i & 0x80) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x40) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x20) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x10) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x08) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x04) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x02) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x01) ? ONE:ZERO,'b');
+                _bits[i] = valblob;
+            }
         }
 
         // Turn all pixels off
