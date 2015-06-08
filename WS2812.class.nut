@@ -48,11 +48,11 @@ class WS2812 {
         draw();
     }
 
-    // ------- PUBLIC FUNCTIONS -------
-
     // Sets a pixel in the buffer
     //   index - the index of the pixel (0 <= index < _frameSize)
     //   color - [r,g,b] (0 <= r,g,b <= 255)
+    //
+    // NOTE: set(index, color) replaces v1.x.x's writePixel(p, color) method
     function set(index, color) {
         assert(index >= 0);
         assert(index < _frameSize);
@@ -66,8 +66,10 @@ class WS2812 {
     }
 
 
-    // Clears the frame buffer
-    // but does not write it to the pixel strip
+    // Sets the frame buffer (or a portion of the frame buffer)
+    // to the specified colour, but does not write it to the pixel strip
+    //
+    // NOTE: fill([0,0,0]) replaces v1.x.x's clear() method
     function fill(color, start=null, end=null) {
         // Set default values
         if (start == null) { start = 0; }
@@ -98,6 +100,8 @@ class WS2812 {
     }
 
     // Writes the frame to the pixel strip
+    //
+    // NOTE: draw() replaces v1.x.x's writeFrame() method
     function draw() {
         _spi.write(_frame);
     }
