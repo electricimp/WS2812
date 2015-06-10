@@ -9,8 +9,6 @@ Some example hardware that uses the WS2812 or WS2812B:
 * [30 LED - 1m strip](http://www.adafruit.com/products/1376)
 * [NeoPixel Stick](http://www.adafruit.com/products/1426)
 
-**To add this library to your project, add** `#require "WS2812.class.nut:1.0.1"` **to the top of your device code**
-
 ## Hardware
 
 WS2812s require a 5V power supply and logic, and each pixel can draw up to 60mA when displaying white in full brightness, so be sure to size your power supply appropriatly. Undersized power supplies (lower voltages and/or insufficent current) can cause glitches and/or failure to produce and light at all.
@@ -21,58 +19,67 @@ Because WS2812s require 5V logic, you will need to shift your logic level to 5V.
 
 ## Class Usage
 
-### Constructor
+All public methods in the WS2812 class return `this`, allowing you to easily chain multiple commands together:
+
+```squirrel
+pixels
+    .set(0, [255,0,0])
+    .set(1, [0,255,0])
+    .fill([0,0,255], 2, 4)
+    .draw();
+```
+
+### constructor(spiBus, numPixels, [draw])
 
 Instantiate the class with a pre-configured SPI object and the number of pixels that are connected. The SPI object must be configured at 7500kHz and have the *MSB_FIRST* flag set:
 
 ```squirrel
+#require "ws2812.class.nut:2.0.0"
+
 // Configure the SPI bus
+spi <- hardware.spi257;
+spi.configure(MSB_FIRST, 7500);
 
-hardware.spi257.configure(MSB_FIRST, 7500)
-
-// Instantiate an array of 8 WS2812s
-
-pixels <- WS2812(hardware.spi257, 8)
+// Instantiate LED array with 5 pixels
+pixels <- WS2812(spi, 5);
 ```
 
-### Class Methods
+An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
 
-The WS2812 class keeps an internal frame that is only output to the pixel array when the **writeFrame()** method is called. As a result, changing the pixel strip takes two steps: writing values to the frame, and writing the frame to the SPI bus.
+### set(*index, color*)
 
-### writePixel(*pixelAddress*, *pixelColor*)
+The *set* method changes the color of a particular pixel in the frame buffer. The color is passed as as an array of three integers between 0 and 255 representing `[red, green, blue]`.
 
-The **writePixel()** method changes the colour of a particular pixel in the frame buffer. However, this will not be written to the hardware until a call to **writeFrame()** is made. The method takes two parameters: the address of the WS2812 that you are changing (its position in the sequence of LEDs, an integer) and the color it should present. The color is passed as an array of three integers, one each for the red, green and blue components. Values range from 0 to 255.
+NOTE: The *set* method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
 
 ```squirrel
-// Change the colour of some pixels in the frame buffer
-
-pixels.writePixel(0, [255, 0, 0])    // Write full red to the first pixel
-pixels.writePixel(1, [127, 0, 0])    // Write half red to the second pixel
-pixels.writePixel(2, [63, 0, 0])     // Write quarter red to the third pixel
-
-// Write the frame buffer to the hardware
-
-pixels.writeFrame()
+// Set and draw a pixel
+pixels.set(0, [127,0,0]).draw();
 ```
 
-### clearFrame()
+### fill(*color, [start], [end]*)
 
-The **clearFrame()** method will clear the frame buffer, ie. set ALL pixels to [0,0,0]). This will not be written to the hardware until a call to **writeFrame()** is made:
+The *fill* methods sets all pixels in the specified range to the desired color. If no range is selected, the entire frame will be filled with the specified color.
+
+NOTE: The *fill* method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
 
 ```squirrel
-// Set all pixels to [0,0,0] in the frame buffer
-
-pixels.clearFrame()
-
-// Write the frame buffer to the hardware
-
-pixels.writeFrame()
+// Turn all LEDs off
+pixels.fill([0,0,0]).draw();
 ```
 
-### writeFrame()
+```squirrel
+// Set half the array red
+// and the other half blue
+pixels
+    .fill([100,0,0], 0, 2)
+    .fill([0,0,100], 3, 4);
+    .draw();
+```
 
-The **writeFrame()** method writes the internal frame buffer to the hardware *(see above examples)*.
+### draw()
 
+The *draw* method draws writes the current frame to the pixel array (see examples above).
 
 ## License
 
