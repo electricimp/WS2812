@@ -19,7 +19,17 @@ Because WS2812s require 5V logic, you will need to shift your logic level to 5V.
 
 ## Class Usage
 
-### constructor(spiBus, numPixels)
+All public methods in the WS2812 class return `this`, allowing you to easily chain multiple commands together:
+
+```squirrel
+pixels
+    .set(0, [255,0,0])
+    .set(1, [0,255,0])
+    .fill([0,0,255], 2, 4)
+    .draw();
+```
+
+### constructor(spiBus, numPixels, [draw])
 
 Instantiate the class with a pre-configured SPI object and the number of pixels that are connected. The SPI object must be configured at 7500kHz and have the *MSB_FIRST* flag set:
 
@@ -34,52 +44,42 @@ spi.configure(MSB_FIRST, 7500);
 pixels <- WS2812(spi, 5);
 ```
 
+An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
+
 ### set(*index, color*)
 
 The *set* method changes the color of a particular pixel in the frame buffer. The color is passed as as an array of three integers between 0 and 255 representing `[red, green, blue]`.
 
-NOTE: The set method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
+NOTE: The *set* method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
 
 ```squirrel
-// Set each pixel individually
-pixels.set(0, [127,0,0]);
-pixels.set(1, [0,127,0]);
-pixels.set(2, [0,0,127]);
-pixels.set(3, [0,127,0]);
-pixels.set(4, [127,0,0]);
-
-// Output the frame
-pixels.draw();
+// Set and draw a pixel
+pixels.set(0, [127,0,0]).draw();
 ```
 
 ### fill(*color, [start], [end]*)
 
 The *fill* methods sets all pixels in the specified range to the desired color. If no range is selected, the entire frame will be filled with the specified color.
 
-NOTE: The set method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
+NOTE: The *fill* method does not output the changes to the pixel strip. After setting up the frame, you must call `draw` (see below) to output the frame to the strip.
 
 ```squirrel
 // Turn all LEDs off
-pixels.fill([0,0,0]);
-
-// Output the frame
-pixels.draw();
+pixels.fill([0,0,0]).draw();
 ```
 
 ```squirrel
 // Set half the array red
-pixels.fill([255,0,0], 0, 2);
-
-// Set the other half blue
-pixels.fill([0,0,255], 3, 4);
-
-// Output the frame
-pixels.draw();
+// and the other half blue
+pixels
+    .fill([100,0,0], 0, 2)
+    .fill([0,0,100], 3, 4);
+    .draw();
 ```
 
 ### draw()
 
-The *draw* method draws writes the current frame to the pixel array.
+The *draw* method draws writes the current frame to the pixel array (see examples above).
 
 ## License
 

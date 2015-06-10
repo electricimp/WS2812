@@ -14,10 +14,10 @@ class WS2812 {
     static BYTES_PER_PIXEL   = 24;
 
     // When instantiated, the WS2812 class will fill this array with blobs to
-    // represent the waveforms to send the numbers 0 to 255. This allows the blobs to be
-    // copied in directly, instead of being built for each pixel - which makes the class faster.
+    // represent the waveforms to send the numbers 0 to 255. This allows the
+    // blobs to be copied in directly, instead of being built for each pixel.
 
-    static _bits     = array(256);
+    static _bits     = array(256, null);
 
     // Private variables passed into the constructor
 
@@ -29,7 +29,7 @@ class WS2812 {
     //    spi          A pre-configured SPI bus (MSB_FIRST, 7500)
     //    frameSize    Number of Pixels per frame
 
-    constructor(spiBus, frameSize) {
+    constructor(spiBus, frameSize, _draw = true) {
         // spiBus must be configured
         _spi = spiBus;
 
@@ -57,9 +57,11 @@ class WS2812 {
             }
         }
 
-        // Turn all pixels off
+        // Clear the pixel buffer
         fill([0,0,0]);
-        draw();
+        if (_draw) {
+            this.draw();
+        }
     }
 
     // Sets a pixel in the buffer
@@ -79,6 +81,8 @@ class WS2812 {
         _frame.writeblob(_bits[color[1]]);
         _frame.writeblob(_bits[color[0]]);
         _frame.writeblob(_bits[color[2]]);
+
+        return this;
     }
 
 
@@ -111,11 +115,13 @@ class WS2812 {
         colorBlob.writeblob(_bits[color[0]]);
         colorBlob.writeblob(_bits[color[2]]);
 
-
+        // Write the color blob to each pixel in the fill
         _frame.seek(start*BYTES_PER_PIXEL);
-        for (local index = start ; index <= end ; index++) {
+        for (local index = start; index <= end; index++) {
             _frame.writeblob(colorBlob);
         }
+
+        return this;
     }
 
     // Writes the frame to the pixel strip
@@ -123,5 +129,7 @@ class WS2812 {
     // NOTE: draw() replaces v1.x.x's writeFrame() method
     function draw() {
         _spi.write(_frame);
+
+        return this;
     }
 }
