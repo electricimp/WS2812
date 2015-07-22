@@ -7,7 +7,7 @@ class WS2812 {
     // This requires one byte per bit to send data at 7.5 MHz via SPI.
     // These consts define the "waveform" to represent a zero or one
 
-    static version = [2,0,0];
+    static version = [2,0,1];
 
     static ZERO            = 0xC0;
     static ONE             = 0xF8;
@@ -28,7 +28,7 @@ class WS2812 {
     // Parameters:
     //    spi          A pre-configured SPI bus (MSB_FIRST, 7500)
     //    frameSize    Number of Pixels per frame
-
+    //    _draw        Whether or not to initially draw a blank frame
     constructor(spiBus, frameSize, _draw = true) {
         // spiBus must be configured
         _spi = spiBus;
@@ -59,9 +59,20 @@ class WS2812 {
 
         // Clear the pixel buffer
         fill([0,0,0]);
+
+        // Output the pixels if required
         if (_draw) {
             this.draw();
         }
+    }
+
+    // Configures the SPI Bus
+    //
+    // NOTE: If using the configure method, you *must* pass `false` to the
+    // _draw parameter in the constructor (or else an error will be thrown)
+    function configure() {
+        _spi.configure(MSB_FIRST, 7500);
+        return this;
     }
 
     // Sets a pixel in the buffer
@@ -129,7 +140,6 @@ class WS2812 {
     // NOTE: draw() replaces v1.x.x's writeFrame() method
     function draw() {
         _spi.write(_frame);
-
         return this;
     }
 }
