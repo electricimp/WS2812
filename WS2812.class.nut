@@ -81,13 +81,12 @@ class WS2812 {
     //
     // NOTE: set(index, color) replaces v1.x.x's writePixel(p, color) method
     function set(index, color) {
-        assert(index >= 0 && index < _frameSize);
-        assert(color[0] >= 0 && color[0] <= 255);
-        assert(color[1] >= 0 && color[1] <= 255);
-        assert(color[2] >= 0 && color[2] <= 255);
+        index = _checkRange(index);
+        color = _checkColorRange(color);
 
         _frame.seek(index * BYTES_PER_PIXEL);
 
+        // Create a blob for the color
         // Red and green are swapped for some reason, so swizzle them back
         _frame.writeblob(_bits[color[1]]);
         _frame.writeblob(_bits[color[0]]);
@@ -95,7 +94,6 @@ class WS2812 {
 
         return this;
     }
-
 
     // Sets the frame buffer (or a portion of the frame buffer)
     // to the specified color, but does not write it to the pixel strip
@@ -107,11 +105,9 @@ class WS2812 {
         if (end == null) { end = _frameSize - 1; }
 
         // Make sure we're not out of bounds
-        assert(start >= 0 && start < _frameSize);
-        assert(end >=0 && end < _frameSize)
-        assert(color[0] >= 0 && color[0] <= 255);
-        assert(color[1] >= 0 && color[1] <= 255);
-        assert(color[2] >= 0 && color[2] <= 255);
+        start = _checkRange(start);
+        end = _checkRange(end);
+        color = _checkColorRange(color);
 
         // Flip start & end if required
         if (start > end) {
@@ -121,6 +117,7 @@ class WS2812 {
         }
 
         // Create a blob for the color
+        // Red and green are swapped for some reason, so swizzle them back
         local colorBlob = blob(BYTES_PER_PIXEL);
         colorBlob.writeblob(_bits[color[1]]);
         colorBlob.writeblob(_bits[color[0]]);
@@ -141,5 +138,19 @@ class WS2812 {
     function draw() {
         _spi.write(_frame);
         return this;
+    }
+
+    function _checkRange(index) {
+        if (index < 0) index = 0;
+        if (index >= _frameSize) index = _frameSize - 1;
+        return index;
+    }
+
+    function _checkColorRange(colors) {
+        foreach(idx, color in colors) {
+            if (color < 0) colors[idx] = 0;
+            if (color > 255) colors[idx] = 255;
+        }
+        return colors
     }
 }
