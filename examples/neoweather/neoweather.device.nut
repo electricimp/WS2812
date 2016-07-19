@@ -1,4 +1,4 @@
-#require "ws2812.class.nut:2.0.1"
+#require "ws2812.class.nut:2.0.2"
 
 class NeoWeather extends WS2812 {
 
