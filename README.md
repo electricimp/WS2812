@@ -1,4 +1,4 @@
-# WS2812 v2.0.2
+# WS2812 v3.0.0
 
 This class allows the imp to drive WS2812 and WS2812B LEDs. The WS2812 is an all-in-one RGB LED with integrated shift register and constant-current driver. The parts are daisy-chained, and a proprietary one-wire protocol is used to send data to the chain of LEDs. Each pixel is individually addressable and this allows the part to be used for a wide range of effects animations.
 
@@ -9,9 +9,7 @@ Some example hardware that uses the WS2812 or WS2812B:
 * [30 LED - 1m strip](http://www.adafruit.com/products/1376)
 * [NeoPixel Stick](http://www.adafruit.com/products/1426)
 
-**To add this library to your project, add `#require "WS2812.class.nut:2.0.2"` to the top of your device code.**
-
-You can view the library’s source code on [GitHub](https://github.com/electricimp/ws2812/tree/v2.0.2).
+**To add this library to your project, add `#require "WS2812.class.nut:3.0.0"` to the top of your device code.**
 
 ## Hardware
 
@@ -35,14 +33,13 @@ pixels
 
 ### Constructor: WS2812(spi, frameSize, [draw])
 
-Instantiate the class with a pre-configured SPI object and the number of pixels that are connected. The SPI object must be configured at 7500kHz and have the *MSB_FIRST* flag set:
+Instantiate the class with a SPI object and the number of pixels that are connected. The SPI object will be configured in the constructor:
 
 ```squirrel
-#require "ws2812.class.nut:2.0.2"
+#require "ws2812.class.nut:3.0.0"
 
-// Configure the SPI bus
+// Select the SPI bus
 spi <- hardware.spi257;
-spi.configure(MSB_FIRST, 7500);
 
 // Instantiate LED array with 5 pixels
 pixels <- WS2812(spi, 5);
@@ -51,19 +48,6 @@ pixels <- WS2812(spi, 5);
 An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
 
 ## Class Methods
-
-### configure()
-
-Rather than pass a preconfigured SPI object to the constructor, you can pass an unconfigured SPI object, and have the *configure()* method automatically configure the SPI object for you.
-
-**NOTE:** If you are using the *configure* method, you **must** pass `false` the the *draw* parameter of the constructor:
-
-```squirrel
-#require "ws2812.class.nut:2.0.2"
-
-// Create and configure an LED array with 5 pixels:
-pixels <- WS2812(hardware.spi257, 5, false).configure();
-```
 
 ### set(*index, color*)
 
