@@ -4,8 +4,7 @@
 
 class WS2812 {
 
-
-    static VERSION = [2,0,2];
+    static VERSION = "3.0.0";
 
     // This class uses SPI to emulate the WS2812s' one-wire protocol.
     // The ideal speed for neopixels is 6400 MHz via SPI.
@@ -176,7 +175,7 @@ class WS2812 {
         }
     }
 
-    _fillBitsArray(_impType) {
+   function _fillBitsArray(_impType) {
         if (_impType == 3) {
             for (local i = 0; i < 256; i++) {
                 local valblob = blob(bytesPerColor);
