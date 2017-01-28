@@ -3,35 +3,47 @@
 // http://opensource.org/licenses/MIT
 
 class WS2812 {
-    // This class uses SPI to emulate the WS2812s' one-wire protocol.
-    // This requires one byte per bit to send data at 7.5 MHz via SPI.
-    // These consts define the "waveform" to represent a zero or one
+
 
     static VERSION = [2,0,2];
 
+    // This class uses SPI to emulate the WS2812s' one-wire protocol.
+    // The ideal speed for neopixels is 6400 MHz via SPI.
+
+    // The closest Imp001 & Imp002 supported SPI datarate is 7500 MHz.
+    // Imp005 supported SPI datarate is 6400 MHz
+    // These consts define the "waveform" to represent a zero or one
     static ZERO            = 0xC0;
     static ONE             = 0xF8;
     static BYTES_PER_PIXEL   = 24;
 
+    // The closest Imp003 supported SPI datarate is 9 MHz.
+    // These consts define the "waveform" to represent a zero-zero, zero-one, one-zero, one-one.
+    static ZERO_ZERO = "\xE0\x0E\x00";
+    static ZERO_ONE = "\xE0\x0F\xC0";
+    static ONE_ZERO = "\xFC\x0E\x00";
+    static ONE_ONE = "\xFC\x0F\xC0";
+    static IMP3_BYTES_PER_PIXEL   = 36;
+
     // When instantiated, the WS2812 class will fill this array with blobs to
     // represent the waveforms to send the numbers 0 to 255. This allows the
     // blobs to be copied in directly, instead of being built for each pixel.
-
     static _bits     = array(256, null);
 
     // Private variables passed into the constructor
-
-    _spi             = null;  // imp SPI interface (pre-configured)
+    _spi             = null;  // imp SPI interface
+    _impType        = null;
+    _bytes_per_pixel = null;
     _frameSize       = null;  // number of pixels per frame
     _frame           = null;  // a blob to hold the current frame
 
     // Parameters:
-    //    spi          A pre-configured SPI bus (MSB_FIRST, 7500)
+    //    spi          A SPI bus (MSB_FIRST, 7500)
     //    frameSize    Number of Pixels per frame
     //    _draw        Whether or not to initially draw a blank frame
     constructor(spiBus, frameSize, _draw = true) {
-        // spiBus must be configured
-        _spi = spiBus;
+        _impType = _getImpType();
+        _spi = _configureSPI(spiBus, _impType);
 
         _frameSize = frameSize;
         _frame = blob(_frameSize * BYTES_PER_PIXEL + 1);
@@ -40,22 +52,8 @@ class WS2812 {
         // Used in constructing the _bits array
         local bytesPerColor = BYTES_PER_PIXEL / 3;
 
-        // Fill the _bits array if required
         // (Multiple instance of WS2812 will only initialize it once)
-        if (_bits[0] == null) {
-            for (local i = 0; i < 256; i++) {
-                local valblob = blob(bytesPerColor);
-                valblob.writen((i & 0x80) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x40) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x20) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x10) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x08) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x04) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x02) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x01) ? ONE:ZERO,'b');
-                _bits[i] = valblob;
-            }
-        }
+         if (_bits[0] == null) _fillBitsArray();
 
         // Clear the pixel buffer
         fill([0,0,0]);
@@ -64,15 +62,6 @@ class WS2812 {
         if (_draw) {
             this.draw();
         }
-    }
-
-    // Configures the SPI Bus
-    //
-    // NOTE: If using the configure method, you *must* pass `false` to the
-    // _draw parameter in the constructor (or else an error will be thrown)
-    function configure() {
-        _spi.configure(MSB_FIRST, 7500);
-        return this;
     }
 
     // Sets a pixel in the buffer
@@ -152,5 +141,64 @@ class WS2812 {
             if (color > 255) colors[idx] = 255;
         }
         return colors
+    }
+
+    function _getImpType() {
+        local env = imp.environment();
+        if (env == ENVIRONMENT_CARD) {
+            return 1;
+        }
+        if (env == ENVIRONMENT_MODULE) {
+            return hardware.getdeviceid().slice(0,1).tointeger();
+        }
+    }
+
+    function _configureSPI(spiBus, _impType) {
+        switch _impType {
+            case 1:
+                // same as 002 config
+            case 2:
+                spiBus.configure(MSB_FIRST, 7500);
+                _bytes_per_pixel = BYTES_PER_PIXEL;
+                break;
+            case 3:
+                spiBus.configure(MSB_FIRST, 9000);
+                _bytes_per_pixel = IMP3_BYTES_PER_PIXEL;
+                break;
+            case 4:
+                spiBus.configure(MSB_FIRST, 6000);
+                _bytes_per_pixel = BYTES_PER_PIXEL;
+                break;
+            case 5:
+                spiBus.configure(MSB_FIRST, 6400);
+                _bytes_per_pixel = BYTES_PER_PIXEL;
+                break;
+        }
+    }
+
+    _fillBitsArray(_impType) {
+        if (_impType == 3) {
+            for (local i = 0; i < 256; i++) {
+                local valblob = blob(bytesPerColor);
+                valblob.writestring(getNumber((i /64) % 4));
+                valblob.writestring(getNumber((i /16) % 4));
+                valblob.writestring(getNumber((i /4) % 4));
+                valblob.writestring(getNumber(i % 4));
+                _bits[i] = valblob;
+            }
+        } else {
+            for (local i = 0; i < 256; i++) {
+                local valblob = blob(bytesPerColor);
+                valblob.writen((i & 0x80) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x40) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x20) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x10) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x08) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x04) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x02) ? ONE:ZERO,'b');
+                valblob.writen((i & 0x01) ? ONE:ZERO,'b');
+                _bits[i] = valblob;
+            }
+        }
     }
 }
