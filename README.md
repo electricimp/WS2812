@@ -19,6 +19,8 @@ Because WS2812s require 5V logic, you will need to shift your logic level to 5V.
 
 ![WS2812 Circuit](./circuit.png)
 
+*NOTE:* We do not recomend using the imp005 with WS2812s. Unlike the imp001, imp002, imp003, and imp004m the imp005 does not use DMA for SPI data transfers. Instead, each byte is written out individually, and this means there will always be a small gap between each byte. Performance of other operations, such as Agent/Decive communications, are blocked when the draw method is called.
+
 ## Class Usage
 
 All public methods in the WS2812 class return `this`, allowing you to easily chain multiple commands together:
@@ -33,7 +35,7 @@ pixels
 
 ### Constructor: WS2812(spi, frameSize, [draw])
 
-Instantiate the class with a SPI object and the number of pixels that are connected. The SPI object will be configured in the constructor:
+Instantiate the class with a SPI object and the number of pixels that are connected. The SPI object will be configured by the constructor. An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
 
 ```squirrel
 #require "ws2812.class.nut:3.0.0"
@@ -44,8 +46,6 @@ spi <- hardware.spi257;
 // Instantiate LED array with 5 pixels
 pixels <- WS2812(spi, 5);
 ```
-
-An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
 
 ## Class Methods
 
@@ -76,7 +76,7 @@ pixels.fill([0,0,0]).draw();
 // and the other half blue
 pixels
     .fill([100,0,0], 0, 2)
-    .fill([0,0,100], 3, 4);
+    .fill([0,0,100], 3, 4)
     .draw();
 ```
 

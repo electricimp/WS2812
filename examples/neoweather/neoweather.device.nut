@@ -1,4 +1,4 @@
-#require "ws2812.class.nut:2.0.2"
+#require "ws2812.class.nut:3.0.0"
 
 class NeoWeather extends WS2812 {
 
@@ -487,7 +487,6 @@ agent.on("seteffect", function(val) {
 const NUMPIXELS = 24;
 
 spi <- hardware.spi257;
-spi.configure(MSB_FIRST, 7500);
 display <- NeoWeather(spi, NUMPIXELS);
 
 server.log("Ready, running impOS "+imp.getsoftwareversion());
