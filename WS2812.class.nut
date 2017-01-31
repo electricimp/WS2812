@@ -6,13 +6,14 @@ class WS2812 {
 
     static VERSION = "3.0.0";
 
-    static ERROR_005 = "Use of this imp module is not advisable. Many opperations like, Agent/Device communication, are blocked when setting LEDs.";
+    static ERROR_005 = "Use of this imp module is not advisable.";
 
     // This class uses SPI to emulate the WS2812s' one-wire protocol.
-    // The ideal speed for neopixels is 6400 MHz via SPI.
+    // The ideal speed for WS2812 LEDs is 6400 MHz via SPI.
 
-    // The closest Imp001 & Imp002 supported SPI datarate is 7500 MHz.
-    // Imp005 supported SPI datarate is 7000 MHz
+    // The closest Imp001 & Imp002 supported SPI datarate is 7500 MHz
+    // Imp004m supported SPI datarate is 6000 MHz
+    // Imp005 supported SPI datarate is 6400 MHz
     // These consts define the "waveform" to represent a zero or one
     static ZERO            = 0xC0;
     static ONE             = 0xF8;
@@ -35,10 +36,10 @@ class WS2812 {
     _spi             = null;  // imp SPI interface
     _frameSize       = null;  // number of pixels per frame
     _frame           = null;  // a blob to hold the current frame
-    _bytes_per_pixel = null;
+    _bytes_per_pixel = null; // number of bytes per pixel
 
     // Parameters:
-    //    spi          A SPI bus (MSB_FIRST, 7500)
+    //    spi          A SPI bus
     //    frameSize    Number of Pixels per frame
     //    _draw        Whether or not to initially draw a blank frame
     constructor(spiBus, frameSize, _draw = true) {
@@ -129,6 +130,9 @@ class WS2812 {
         return this;
     }
 
+    // Private functions
+    // --------------------------------------------------
+
     function _checkRange(index) {
         if (index < 0) index = 0;
         if (index >= _frameSize) index = _frameSize - 1;
@@ -173,7 +177,10 @@ class WS2812 {
             case 5:
                 server.error(ERROR_005);
                 _bytes_per_pixel = BYTES_PER_PIXEL;
-                _spi.configure(MSB_FIRST, 7000); // sets datarate to 7619
+                // Note: to see the actual rate log actualRate
+                // Passing in 6000 actually sets datarate to 6400
+                local actualRate = _spi.configure(MSB_FIRST, 6000);
+                // server.log(actual Rate)
                 break;
         }
     }

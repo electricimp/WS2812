@@ -19,7 +19,7 @@ Because WS2812s require 5V logic, you will need to shift your logic level to 5V.
 
 ![WS2812 Circuit](./circuit.png)
 
-*NOTE:* We do not recomend using the imp005 with WS2812s. Unlike the imp001, imp002, imp003, and imp004m the imp005 does not use DMA for SPI data transfers. Instead, each byte is written out individually, and this means there will always be a small gap between each byte. Performance of other operations, such as Agent/Decive communications, are blocked when the draw method is called.
+*WARNING:* We do not recomend using the imp005 with WS2812s. Unlike the imp001, imp002, imp003, and imp004m the imp005 does not use DMA for SPI data transfers. Instead, each byte is written out individually, and this means there will always be a small gap between each byte. As a result, LED's may not work as expected and performance of other operations, such as Agent/Decive communications, are blocked when the draw method is called.
 
 ## Class Usage
 
