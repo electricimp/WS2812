@@ -4,9 +4,7 @@
 
 class WS2812 {
 
-    static VERSION = "3.0.0";
-
-    static ERROR_005 = "Use of this imp module is not advisable.";
+    static VERSION = "3.0.1";
 
     // This class uses SPI to emulate the WS2812s' one-wire protocol.
     // The ideal speed for WS2812 LEDs is 6400 MHz via SPI.
@@ -175,7 +173,8 @@ class WS2812 {
                 _spi.configure(MSB_FIRST, 6000);
                 break;
             case 5:
-                server.error(ERROR_005);
+                // Log imp005 warning
+                server.log("//////////////////////////////////////////////////////////////////\n/////// WARNING:  Use of this imp module is not advisable. ///////\n//////////////////////////////////////////////////////////////////\n");
                 _bytes_per_pixel = BYTES_PER_PIXEL;
                 // Note: to see the actual rate log actualRate
                 // Passing in 6000 actually sets datarate to 6400

@@ -1,0 +1,16 @@
+{
+    "modelId": "nQR6QQYil3vh" /* Test Group D */,
+    "devices": [
+        "500098f1706fd382" /* M - Imp005+LED (500098f1706fd382) */,
+        "23497c068fb7bdee" /* N - Imp001+LED (23497c068fb7bdee) */,
+        "30000c2a690c9744" /* L - Imp003+LED (30000c2a690c9744) */
+    ],
+    "agentFile": false,
+    "deviceFile": "WS2812.class.nut",
+    "stopOnFailure": false,
+    "timeout": 60,
+    "tests": [
+        "*.test.nut",
+        "tests/**/*.test.nut"
+    ]
+}
