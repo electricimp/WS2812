@@ -4,7 +4,7 @@
 
 class WS2812 {
 
-    static VERSION = "3.0.1";
+    static VERSION = "3.0.2";
 
     // This class uses SPI to emulate the WS2812s' one-wire protocol.
     // The ideal speed for WS2812 LEDs is 6400 MHz via SPI.
@@ -162,15 +162,15 @@ class WS2812 {
                 // same as 002 config
             case 2:
                 _bytes_per_pixel = BYTES_PER_PIXEL;
-                _spi.configure(MSB_FIRST, 7500);
+                _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 7500);
                 break;
             case 3:
                 _bytes_per_pixel = IMP3_BYTES_PER_PIXEL;
-                _spi.configure(MSB_FIRST, 9000);
+                _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 9000);
                 break;
             case 4:
                 _bytes_per_pixel = BYTES_PER_PIXEL;
-                _spi.configure(MSB_FIRST, 6000);
+                _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 break;
             case 5:
                 // Log imp005 warning
