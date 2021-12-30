@@ -45,6 +45,7 @@ class WS2812 {
     //    spi          A SPI bus
     //    frameSize    Number of Pixels per frame
     //    _draw        Whether or not to initially draw a blank frame
+    //    _rgbw        Whether or not the pixels are RGBW (instead of RGB)
     constructor(spiBus, frameSize, _draw = true, _rgbw = false) {
         this._rgbw = _rgbw;
         
@@ -56,7 +57,7 @@ class WS2812 {
         _frame[_frameSize * _bytes_per_pixel] = 0;
 
         // Used in constructing the _bits array
-        local bytesPerColor = _bytes_per_pixel / 3;
+        local bytesPerColor = _bytes_per_pixel / (_rgbw ? 4 : 3);
 
         // (Multiple instance of WS2812 will only initialize it once)
          if (_bits[0] == null) _fillBitsArray(impType, bytesPerColor);
