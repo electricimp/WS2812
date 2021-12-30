@@ -4,7 +4,7 @@
 
 class WS2812 {
 
-    static VERSION = "3.0.0";
+    static VERSION = "3.0.1";
 
     static ERROR_005 = "Use of this imp module is not advisable.";
 
@@ -164,22 +164,22 @@ class WS2812 {
                 // same as 002 config
             case 2:
                 _bytes_per_pixel = BYTES_PER_PIXEL;
-                _spi.configure(MSB_FIRST, 7500);
+                _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 7500);
                 break;
             case 3:
                 _bytes_per_pixel = IMP3_BYTES_PER_PIXEL;
-                _spi.configure(MSB_FIRST, 9000);
+                _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 9000);
                 break;
             case 4:
                 _bytes_per_pixel = BYTES_PER_PIXEL;
-                _spi.configure(MSB_FIRST, 6000);
+                _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 break;
             case 5:
                 server.error(ERROR_005);
                 _bytes_per_pixel = BYTES_PER_PIXEL;
                 // Note: to see the actual rate log actualRate
                 // Passing in 6000 actually sets datarate to 6400
-                local actualRate = _spi.configure(MSB_FIRST, 6000);
+                local actualRate = _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 // server.log(actual Rate)
                 break;
         }
