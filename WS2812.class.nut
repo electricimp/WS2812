@@ -4,7 +4,7 @@
 
 class WS2812 {
 
-    static VERSION = "3.0.1";
+    static VERSION = "3.0.2";
 
     static ERROR_005 = "Use of this imp module is not advisable.";
 
@@ -18,6 +18,7 @@ class WS2812 {
     static ZERO            = 0xC0;
     static ONE             = 0xF8;
     static BYTES_PER_PIXEL   = 24;
+    static BYTES_PER_PIXEL_W = 32;
 
     // The closest Imp003 supported SPI datarate is 9 MHz.
     // These consts define the "waveform" to represent a zero-zero, zero-one, one-zero, one-one.
@@ -26,6 +27,7 @@ class WS2812 {
     static ONE_ZERO = "\xFC\x0E\x00";
     static ONE_ONE = "\xFC\x0F\xC0";
     static IMP3_BYTES_PER_PIXEL   = 36;
+    static IMP3_BYTES_PER_PIXEL_W = 48;
 
     // When instantiated, the WS2812 class will fill this array with blobs to
     // represent the waveforms to send the numbers 0 to 255. This allows the
@@ -36,15 +38,18 @@ class WS2812 {
     _spi             = null;  // imp SPI interface
     _frameSize       = null;  // number of pixels per frame
     _frame           = null;  // a blob to hold the current frame
-    _bytes_per_pixel = null; // number of bytes per pixel
+    _bytes_per_pixel = null;  // number of bytes per pixel
+    _rgbw            = false; // is this an RGBW string
 
     // Parameters:
     //    spi          A SPI bus
     //    frameSize    Number of Pixels per frame
     //    _draw        Whether or not to initially draw a blank frame
-    constructor(spiBus, frameSize, _draw = true) {
+    constructor(spiBus, frameSize, _draw = true, _rgbw = false) {
+        this._rgbw = _rgbw;
+        
         local impType = _getImpType();
-        _configureSPI(spiBus, impType);
+        _configureSPI(spiBus, impType, _rgbw);
 
         _frameSize = frameSize;
         _frame = blob(_frameSize * _bytes_per_pixel + 1);
@@ -57,7 +62,7 @@ class WS2812 {
          if (_bits[0] == null) _fillBitsArray(impType, bytesPerColor);
 
         // Clear the pixel buffer
-        fill([0,0,0]);
+        fill([0,0,0,0]);
 
         // Output the pixels if required
         if (_draw) {
@@ -81,6 +86,7 @@ class WS2812 {
         _frame.writeblob(_bits[color[1]]);
         _frame.writeblob(_bits[color[0]]);
         _frame.writeblob(_bits[color[2]]);
+        if (_rgbw) _frame.writeblob(_bits[(color.len() >= 4) ? color[3] : 0]);
 
         return this;
     }
@@ -112,6 +118,7 @@ class WS2812 {
         colorBlob.writeblob(_bits[color[1]]);
         colorBlob.writeblob(_bits[color[0]]);
         colorBlob.writeblob(_bits[color[2]]);
+        if (_rgbw) colorBlob.writeblob(_bits[(color.len() >= 4) ? color[3] : 0]);
 
         // Write the color blob to each pixel in the fill
         _frame.seek(start*_bytes_per_pixel);
@@ -157,28 +164,28 @@ class WS2812 {
         }
     }
 
-    function _configureSPI(spiBus, impType) {
+    function _configureSPI(spiBus, impType, rgbw) {
         _spi = spiBus;
         switch (impType) {
             case 1:
                 // same as 002 config
             case 2:
-                _bytes_per_pixel = BYTES_PER_PIXEL;
+                _bytes_per_pixel = rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 7500);
                 break;
             case 3:
-                _bytes_per_pixel = IMP3_BYTES_PER_PIXEL;
+                _bytes_per_pixel = rgbw ? IMP3_BYTES_PER_PIXEL_W : IMP3_BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 9000);
                 break;
             case 4:
-                _bytes_per_pixel = BYTES_PER_PIXEL;
+                _bytes_per_pixel = rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 break;
             case 5:
                 server.error(ERROR_005);
-                _bytes_per_pixel = BYTES_PER_PIXEL;
                 // Note: to see the actual rate log actualRate
                 // Passing in 6000 actually sets datarate to 6400
+                _bytes_per_pixel = rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 local actualRate = _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 // server.log(actual Rate)
                 break;
