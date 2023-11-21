@@ -82,9 +82,9 @@ class WS2812 {
 
         // Create a blob for the color
         // Red and green are swapped for some reason, so swizzle them back
-        _frame.writeblob(_getBitPattern[color[1]]);
-        _frame.writeblob(_getBitPattern[color[0]]);
-        _frame.writeblob(_getBitPattern[color[2]]);
+        _frame.writeblob(_getBitPattern(color[1]));
+        _frame.writeblob(_getBitPattern(color[0]));
+        _frame.writeblob(_getBitPattern(color[2]));
 
         return this;
     }
@@ -113,9 +113,9 @@ class WS2812 {
         // Create a blob for the color
         // Red and green are swapped for some reason, so swizzle them back
         local colorBlob = blob(_bytes_per_pixel);
-        colorBlob.writeblob(_getBitPattern[color[1]]);
-        colorBlob.writeblob(_getBitPattern[color[0]]);
-        colorBlob.writeblob(_getBitPattern[color[2]]);
+        colorBlob.writeblob(_getBitPattern(color[1]));
+        colorBlob.writeblob(_getBitPattern(color[0]));
+        colorBlob.writeblob(_getBitPattern(color[2]));
 
         // Write the color blob to each pixel in the fill
         _frame.seek(start*_bytes_per_pixel);
