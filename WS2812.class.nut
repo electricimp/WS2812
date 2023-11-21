@@ -59,9 +59,6 @@ class WS2812 {
         // Used in constructing the _bits array
         local bytesPerColor = _bytes_per_pixel / 3;
 
-        // (Multiple instance of WS2812 will only initialize it once)
-        // if (_bits[0] == null) _fillBitsArray(impType, bytesPerColor);
-
         // Clear the pixel buffer
         fill([0,0,0]);
 
@@ -220,34 +217,6 @@ class WS2812 {
         valblob.writen((i & 0x01) ? ONE:ZERO,'b');
         return valblob;
     }
-
-    /*
-    function _fillBitsArray(impType, bytesPerColor) {
-        if (impType == 3) {
-            for (local i = 0; i < 256; i++) {
-                local valblob = blob(bytesPerColor);
-                valblob.writestring(_getNumber((i /64) % 4));
-                valblob.writestring(_getNumber((i /16) % 4));
-                valblob.writestring(_getNumber((i /4) % 4));
-                valblob.writestring(_getNumber(i % 4));
-                _bits[i] = valblob;
-            }
-        } else {
-            for (local i = 0; i < 256; i++) {
-                local valblob = blob(bytesPerColor);
-                valblob.writen((i & 0x80) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x40) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x20) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x10) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x08) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x04) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x02) ? ONE:ZERO,'b');
-                valblob.writen((i & 0x01) ? ONE:ZERO,'b');
-                _bits[i] = valblob;
-            }
-        }
-    }
-    */
 
     function _getNumber(num) {
         if(num == 0) return ZERO_ZERO;

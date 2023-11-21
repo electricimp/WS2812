@@ -18,7 +18,7 @@ if ("locationstr" in savedata) {
     LOCATIONSTR = savedata.locationstr;
     server.log("Restored Location String: "+LOCATIONSTR);
 }
-local LAT = null; 
+local LAT = null;
 local LON = null;
 
 // this function just assigns a big string to a global.
