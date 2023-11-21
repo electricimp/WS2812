@@ -1,4 +1,5 @@
-// Copyright (c) 2015 Electric Imp
+// Copyright (c) 2015-19 Electric Imp
+// Copyright (c) 2020-23 KORE Wireless
 // This file is licensed under the MIT License
 // http://opensource.org/licenses/MIT
 
@@ -13,29 +14,29 @@ class WS2812 {
     // Imp004m supported SPI datarate is 6000 MHz
     // Imp005 supported SPI datarate is 6400 MHz
     // These consts define the "waveform" to represent a zero or one
-    static ZERO            = 0xC0;
-    static ONE             = 0xF8;
-    static BYTES_PER_PIXEL   = 24;
+    static ZERO                 = 0xC0;
+    static ONE                  = 0xF8;
+    static BYTES_PER_PIXEL      = 24;
 
     // The closest Imp003 supported SPI datarate is 9 MHz.
     // These consts define the "waveform" to represent a zero-zero, zero-one, one-zero, one-one.
-    static ZERO_ZERO = "\xE0\x0E\x00";
-    static ZERO_ONE = "\xE0\x0F\xC0";
-    static ONE_ZERO = "\xFC\x0E\x00";
-    static ONE_ONE = "\xFC\x0F\xC0";
-    static IMP3_BYTES_PER_PIXEL   = 36;
+    static ZERO_ZERO            = "\xE0\x0E\x00";
+    static ZERO_ONE             = "\xE0\x0F\xC0";
+    static ONE_ZERO             = "\xFC\x0E\x00";
+    static ONE_ONE              = "\xFC\x0F\xC0";
+    static IMP3_BYTES_PER_PIXEL = 36;
 
     // When instantiated, the WS2812 class will fill this array with blobs to
     // represent the waveforms to send the numbers 0 to 255. This allows the
     // blobs to be copied in directly, instead of being built for each pixel.
-    static _bits     = array(256, null);
+    static _bits                = array(256, null);
 
     // Private variables passed into the constructor
-    _spi             = null;    // imp SPI interface
-    _frameSize       = null;    // number of pixels per frame
-    _frame           = null;    // a blob to hold the current frame
-    _bytes_per_pixel = null;    // number of bytes per pixel
-    _makeBitPattern  = null;    // (strategy)
+    _spi                        = null;    // imp SPI interface
+    _frameSize                  = null;    // number of pixels per frame
+    _frame                      = null;    // a blob to hold the current frame
+    _bytes_per_pixel            = null;    // number of bytes per pixel
+    _makeBitPattern             = null;    // Function to generate patterns
 
     // Parameters:
     //    spi          A SPI bus
@@ -65,9 +66,7 @@ class WS2812 {
         fill([0,0,0]);
 
         // Output the pixels if required
-        if (_draw) {
-            this.draw();
-        }
+        if (_draw) this.draw();
     }
 
     // Sets a pixel in the buffer
