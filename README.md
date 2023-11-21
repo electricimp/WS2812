@@ -1,4 +1,4 @@
-# WS2812 3.0.0
+# WS2812 3.0.1
 
 This class allows the imp to drive WS2812 and WS2812B LEDs. The WS2812 is an all-in-one RGB LED with integrated shift register and constant-current driver. The parts are daisy-chained, and a proprietary one-wire protocol is used to send data to the chain of LEDs. Each pixel is individually addressable and this allows the part to be used for a wide range of effects animations.
 
@@ -9,7 +9,7 @@ Some example hardware that uses the WS2812 or WS2812B:
 * [30 LED - 1m strip](http://www.adafruit.com/products/1376)
 * [NeoPixel Stick](http://www.adafruit.com/products/1426)
 
-**To add this library to your project, add** `#require "WS2812.class.nut:3.0.0"` **to the top of your device code.**
+**To add this library to your project, add** `#require "WS2812.class.nut:3.0.1"` **to the top of your device code.**
 
 ## Hardware
 
@@ -19,7 +19,7 @@ Because WS2812s require 5V logic, you will need to shift your logic level to 5V.
 
 ![WS2812 Circuit](./circuit.png)
 
-**Warning** We do not recommend using the imp005 with WS2812s. Unlike the imp001, imp002, imp003 and imp004m, the imp005 does not use DMA for SPI data transfers. Instead, each byte is written out individually, and this means there will always be a small gap between each byte. As a result, the LEDs may not work as expected and the performance of other operations, such as Agent/Device communications, are blocked when the *draw()* method is called.
+**Warning** We do not recommend using the imp005 with WS2812s. Unlike the imp001, imp002, imp003 and imp004m, the imp005 does not use DMA for SPI data transfers. Instead, each byte is written out individually, and this means there will always be a small gap between each byte. As a result, the LEDs may not work as expected.
 
 ## Class Usage
 
@@ -38,7 +38,7 @@ pixels
 Instantiate the class with an imp SPI object and the number of pixels that are connected. The SPI object will be configured by the constructor. An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
 
 ```squirrel
-#require "ws2812.class.nut:3.0.0"
+#require "WS2812.class.nut:3.0.1"
 
 // Select the SPI bus
 spi <- hardware.spi257;

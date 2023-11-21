@@ -1,4 +1,4 @@
-#require "ws2812.class.nut:3.0.0"
+#require "WS2812.class.nut:3.0.1"
 
 class NeoWeather extends WS2812 {
 
@@ -8,7 +8,7 @@ class NeoWeather extends WS2812 {
     NEWPIXELFACTOR      = 1000; // 1/100 pixels will show a new "drop" for a factor 1 effect
     LIGHTNINGFACTOR     = 5000; // factor/5000 refreshes will yield lightning
     SCALE               = 100;  // NEWPIXELFACTOR / maximum "factor" value provided to an effect
-                            // this class uses factor 0-10 to set intensity
+                                // this class uses factor 0-10 to set intensity
     MAXNEWDROP          = 500;  // max percent chance a new drop will occur on an empty pixel
     MAXLIGHTNING        = 10;   // max percentage chance lightning will occur on an frame
     LTBRTSCALE          = 3.1;  // amount to scale lightning brightness with intensity factor
@@ -17,9 +17,9 @@ class NeoWeather extends WS2812 {
 
     /* control parameters for temperature color effect */
     TEMPFACTORDIV   = 4.0;
-    TEMPRANGE       = 40; // 40 degrees C of range
+    TEMPRANGE       = 40;       // 40 degrees C of range
     TEMPMIN         = -10;
-    TEMPRBOFFSET    = 10; // red and green stay out of the middle by 10 degrees each to avoid white
+    TEMPRBOFFSET    = 10;       // red and green stay out of the middle by 10 degrees each to avoid white
 
     /* default color values */
     RED         = [16,0,0];

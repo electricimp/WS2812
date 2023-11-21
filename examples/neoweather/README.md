@@ -1,4 +1,5 @@
 # Neopixel Weather Display
+
 This class uses a strip of WS2812 "Neopixels" as an display to show ambient "weather effects". The result is a handy gadget to have by a front door or by your desk, especially if you don't have a window. Distinct animations are included for:
 
 * Drizzle / Rain
@@ -13,6 +14,6 @@ Weather data is obtained from [Weather Underground](http://wunderground.com), wh
 
 The Electric Imp Agent in this example also serves a small web page to allow the user to change the forecast location and view the 5-day forecast. The 5-day forecast is sourced from [forecast.io](http://forecast.io), another very useful service with free developer tools.
 
-#Hardware Configuration
+# Hardware Configuration
 
 ![NeoPixel Circuit](../../circuit.png)
