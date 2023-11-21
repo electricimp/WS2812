@@ -4,7 +4,7 @@
 
 class WS2812 {
 
-    static VERSION = "3.0.2";
+    static VERSION = "3.0.1";
 
     // This class uses SPI to emulate the WS2812s' one-wire protocol.
     // The ideal speed for WS2812 LEDs is 6400 MHz via SPI.
