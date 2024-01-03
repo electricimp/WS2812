@@ -43,6 +43,7 @@ class WS2812 {
     _frameSize                      = null;     // number of pixels per frame
     _frame                          = null;     // a blob to hold the current frame
     _bytes_per_pixel                = null;     // number of bytes per pixel
+    // FROM 3.0.1
     _makeBitPattern                 = null;     // Function to generate patterns
     // FROM 4.0.0
     _use_rgbw                       = null;     // Are we using RGBW strings?
