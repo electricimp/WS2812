@@ -5,7 +5,10 @@
 
 class WS2812 {
 
-    static VERSION = "3.0.1";
+    static VERSION = "4.0.0";
+
+    // Imp usage warning
+    static ERROR_IMP_005 = "Use of the imp005 module with the WS2812 library is not advisable.";
 
     // This class uses SPI to emulate the WS2812s' one-wire protocol.
     // The ideal speed for WS2812 LEDs is 6400 MHz via SPI.
@@ -14,17 +17,21 @@ class WS2812 {
     // Imp004m supported SPI datarate is 6000 MHz
     // Imp005 supported SPI datarate is 6400 MHz
     // These consts define the "waveform" to represent a zero or one
-    static ZERO                 = 0xC0;
-    static ONE                  = 0xF8;
-    static BYTES_PER_PIXEL      = 24;
+    static ZERO                     = 0xC0;
+    static ONE                      = 0xF8;
+    static BYTES_PER_PIXEL          = 24;
+    // FROM 4.0.0
+    static BYTES_PER_PIXEL_W        = 32;
 
     // The closest Imp003 supported SPI datarate is 9 MHz.
     // These consts define the "waveform" to represent a zero-zero, zero-one, one-zero, one-one.
-    static ZERO_ZERO            = "\xE0\x0E\x00";
-    static ZERO_ONE             = "\xE0\x0F\xC0";
-    static ONE_ZERO             = "\xFC\x0E\x00";
-    static ONE_ONE              = "\xFC\x0F\xC0";
-    static IMP3_BYTES_PER_PIXEL = 36;
+    static ZERO_ZERO                = "\xE0\x0E\x00";
+    static ZERO_ONE                 = "\xE0\x0F\xC0";
+    static ONE_ZERO                 = "\xFC\x0E\x00";
+    static ONE_ONE                  = "\xFC\x0F\xC0";
+    static IMP3_BYTES_PER_PIXEL     = 36;
+    // FROM 4.0.0
+    static IMP3_BYTES_PER_PIXEL_W   = 48;
 
     // When instantiated, the WS2812 class will fill this array with blobs to
     // represent the waveforms to send the numbers 0 to 255. This allows the
@@ -32,20 +39,27 @@ class WS2812 {
     static _bits                = array(256, null);
 
     // Private variables passed into the constructor
-    _spi                        = null;    // imp SPI interface
-    _frameSize                  = null;    // number of pixels per frame
-    _frame                      = null;    // a blob to hold the current frame
-    _bytes_per_pixel            = null;    // number of bytes per pixel
-    _makeBitPattern             = null;    // Function to generate patterns
+    _spi                            = null;     // imp SPI interface
+    _frameSize                      = null;     // number of pixels per frame
+    _frame                          = null;     // a blob to hold the current frame
+    _bytes_per_pixel                = null;     // number of bytes per pixel
+    _makeBitPattern                 = null;     // Function to generate patterns
+    // FROM 4.0.0
+    _use_rgbw                       = null;     // Are we using RGBW strings?
 
     // Parameters:
     //    spi          A SPI bus
     //    frameSize    Number of Pixels per frame
     //    _draw        Whether or not to initially draw a blank frame
-    constructor(spiBus, frameSize, _draw = true) {
+    //    _rgbw        Whether or not the pixels are RGBS (instead of RGB)
+    constructor(spiBus, frameSize, _draw = true, _rgbw = false) {
+        // FROM 4.0.0
+        _use_rgbw = _rgbw;
+
         local impType = _getImpType();
         _configureSPI(spiBus, impType);
 
+        // FROM 3.0.1
         if (impType == 3) {
             _makeBitPattern = _makeBitPattern003;
         } else {
@@ -56,9 +70,6 @@ class WS2812 {
         _frame = blob(_frameSize * _bytes_per_pixel + 1);
         _frame[_frameSize * _bytes_per_pixel] = 0;
 
-        // Used in constructing the _bits array
-        local bytesPerColor = _bytes_per_pixel / 3;
-
         // Clear the pixel buffer
         fill([0,0,0]);
 
@@ -68,7 +79,7 @@ class WS2812 {
 
     // Sets a pixel in the buffer
     //   index - the index of the pixel (0 <= index < _frameSize)
-    //   color - [r,g,b] (0 <= r,g,b <= 255)
+    //   color - [r,g,b] (0 <= r,g,b <= 255), or [r,g,b,a] with an alpha (RGBW)
     //
     // NOTE: set(index, color) replaces v1.x.x's writePixel(p, color) method
     function set(index, color) {
@@ -82,6 +93,8 @@ class WS2812 {
         _frame.writeblob(_getBitPattern(color[1]));
         _frame.writeblob(_getBitPattern(color[0]));
         _frame.writeblob(_getBitPattern(color[2]));
+        // FROM 4.0.0
+        if (_use_rgbw) _frame.writeblob(_getBitPattern((color.len() >= 4) ? color[3] : 0));
 
         return this;
     }
@@ -113,6 +126,8 @@ class WS2812 {
         colorBlob.writeblob(_getBitPattern(color[1]));
         colorBlob.writeblob(_getBitPattern(color[0]));
         colorBlob.writeblob(_getBitPattern(color[2]));
+        // FROM 4.0.0
+        if (_use_rgbw) _frame.writeblob(_getBitPattern((color.len() >= 4) ? color[3] : 0));
 
         // Write the color blob to each pixel in the fill
         _frame.seek(start*_bytes_per_pixel);
@@ -162,31 +177,32 @@ class WS2812 {
         _spi = spiBus;
         switch (impType) {
             case 1:
-                // same as 002 config
+                // Same as 002 config
             case 2:
-                _bytes_per_pixel = BYTES_PER_PIXEL;
+                _bytes_per_pixel = _use_rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 7500);
                 break;
             case 3:
-                _bytes_per_pixel = IMP3_BYTES_PER_PIXEL;
+                _bytes_per_pixel = _use_rgbw ? IMP3_BYTES_PER_PIXEL_W : IMP3_BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 9000);
                 break;
             case 4:
-                _bytes_per_pixel = BYTES_PER_PIXEL;
+                _bytes_per_pixel = _use_rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 break;
             case 5:
                 // Log imp005 warning
-                server.log("//////////////////////////////////////////////////////////////////\n/////// WARNING:  Use of this imp module is not advisable. ///////\n//////////////////////////////////////////////////////////////////\n");
-                _bytes_per_pixel = BYTES_PER_PIXEL;
+                server.error(ERROR_IMP_005);
+                _bytes_per_pixel = _use_rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 // Note: to see the actual rate log actualRate
                 // Passing in 6000 actually sets datarate to 6400
-                local actualRate = _spi.configure(MSB_FIRST, 6000);
+                local actualRate = _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 // server.log(actual Rate)
                 break;
         }
     }
 
+    // FROM 3.0.1
     // @rlipscome's lazy cache `_bits` fix
     function _getBitPattern(i) {
         if (_bits[i] != null) return _bits[i];
@@ -195,7 +211,7 @@ class WS2812 {
     }
 
     function _makeBitPattern003(i) {
-        local bytesPerColor = _bytes_per_pixel / 3;
+        local bytesPerColor = _bytes_per_pixel / (_use_rgbw ? 4 : 3);
         local valblob = blob(bytesPerColor);
         valblob.writestring(_getNumber((i / 64) % 4));
         valblob.writestring(_getNumber((i / 16) % 4));
@@ -205,16 +221,16 @@ class WS2812 {
     }
 
     function _makeBitPatternDefault(i) {
-        local bytesPerColor = _bytes_per_pixel / 3;
+        local bytesPerColor = _bytes_per_pixel / (_use_rgbw ? 4 : 3);
         local valblob = blob(bytesPerColor);
-        valblob.writen((i & 0x80) ? ONE:ZERO,'b');
-        valblob.writen((i & 0x40) ? ONE:ZERO,'b');
-        valblob.writen((i & 0x20) ? ONE:ZERO,'b');
-        valblob.writen((i & 0x10) ? ONE:ZERO,'b');
-        valblob.writen((i & 0x08) ? ONE:ZERO,'b');
-        valblob.writen((i & 0x04) ? ONE:ZERO,'b');
-        valblob.writen((i & 0x02) ? ONE:ZERO,'b');
-        valblob.writen((i & 0x01) ? ONE:ZERO,'b');
+        valblob.writen((i & 0x80) ? ONE : ZERO, 'b');
+        valblob.writen((i & 0x40) ? ONE : ZERO, 'b');
+        valblob.writen((i & 0x20) ? ONE : ZERO, 'b');
+        valblob.writen((i & 0x10) ? ONE : ZERO, 'b');
+        valblob.writen((i & 0x08) ? ONE : ZERO, 'b');
+        valblob.writen((i & 0x04) ? ONE : ZERO, 'b');
+        valblob.writen((i & 0x02) ? ONE : ZERO, 'b');
+        valblob.writen((i & 0x01) ? ONE : ZERO, 'b');
         return valblob;
     }
 
