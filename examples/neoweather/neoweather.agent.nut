@@ -1,5 +1,6 @@
 // Weather Underground Forecast Agent
 // Copyright (C) 2014 Electric Imp, inc.
+// Copyright (C) 2024 KORE Wireless.
 
 server.log("Weather Agent Running");
 local AGENTRELOADED = true;

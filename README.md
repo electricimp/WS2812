@@ -9,6 +9,8 @@ Some example hardware that uses the WS2812 or WS2812B:
 * [30 LED - 1m strip](http://www.adafruit.com/products/1376)
 * [NeoPixel Stick](http://www.adafruit.com/products/1426)
 
+The library also supports RGBW NeoPixels, such as [Ultra Bright 4 Watt RGBW NeoPixel LED](https://www.adafruit.com/product/5408)
+
 **To add this library to your project, add** `#require "WS2812.class.nut:4.0.0"` **to the top of your device code.**
 
 ## Hardware
@@ -40,13 +42,15 @@ Instantiate the class with an imp SPI object and the number of pixels that are c
 An optional fourth parameter can be set to enable support for RGBW pixels. The default value is `false`.
 
 
+#### Example ####
+
 ```squirrel
 #require "WS2812.class.nut:4.0.0"
 
 // Select the SPI bus
 spi <- hardware.spi257;
 
-// Instantiate LED array with 5 pixels
+// Instantiate RGB LED array with 5 pixels
 pixels <- WS2812(spi, 5);
 ```
 
@@ -54,9 +58,11 @@ pixels <- WS2812(spi, 5);
 
 ### set(*index, color*)
 
-The *set()* method changes the color of a particular pixel in the frame buffer. The color is passed as an array of three integers between 0 and 255 representing `[red, green, blue]`. If the pixels are RGBW then the array has four integers, `[red, green, blue, white]`.
+The `set()` method changes the color of a particular pixel in the frame buffer. The color is passed as an array of three integers between 0 and 255 representing `[red, green, blue]`. If the pixels are RGBW then the array has four integers, `[red, green, blue, white]`.
 
-**Note** The *set()* method does not output the changes to the pixel strip. After setting up the frame, you must call *draw()* (see below) to output the frame to the strip.
+**Note** The `set()` method does not output the changes to the pixel strip. After setting up the frame, you must call `draw()` (see below) to output the frame to the strip.
+
+#### Example ####
 
 ```squirrel
 // Set and draw a pixel
@@ -65,9 +71,11 @@ pixels.set(0, [127,0,0]).draw();
 
 ### fill(*color[, start][, end]*)
 
-The *fill()* method sets all pixels in the specified range to the desired color. If no range is selected, the entire frame will be filled with the specified color. The color is passed as an array of three integers between 0 and 255 representing `[red, green, blue]`. If the pixels are RGBW then the array has four integers, `[red, green, blue, white]`.
+The `fill()` method sets all pixels in the specified range to the desired color. If no range is selected, the entire frame will be filled with the specified color. The color is passed as an array of three integers between 0 and 255 representing `[red, green, blue]`. If the pixels are RGBW then the array has four integers, `[red, green, blue, white]`.
 
-**Note** The *fill()* method does not output the changes to the pixel strip. After setting up the frame, you must call *draw()* (see below) to output the frame to the strip.
+**Note** The `fill()` method does not output the changes to the pixel strip. After setting up the frame, you must call `draw()` (see below) to output the frame to the strip.
+
+#### Examples ####
 
 ```squirrel
 // Turn all LEDs off
@@ -85,7 +93,7 @@ pixels
 
 ### draw()
 
-The *draw()* method draws writes the current frame to the pixel array (see examples above).
+The `draw()` method draws writes the current frame to the pixel array (see examples above).
 
 ## License
 
