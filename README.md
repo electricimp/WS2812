@@ -35,14 +35,18 @@ pixels
     .draw();
 ```
 
+The above example is for RGB Neopixels. For RGBW LEDs, you would supply colors with four components, RBG plus White.
+
 ### Constructor: WS2812(*spi, numberOfPixels[, draw][, rgbw]*)
 
-Instantiate the class with an imp SPI object and the number of pixels that are connected. The SPI object will be configured by the constructor. An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
+Instantiate the class with an imp SPI object and the number of pixels that are connected. The SPI object will be configured by the constructor.
+
+An optional third parameter can be set to control whether the class will draw an empty frame on initialization. The default value is `true`.
 
 An optional fourth parameter can be set to enable support for RGBW pixels. The default value is `false`.
 
 
-#### Example ####
+#### Examples ####
 
 ```squirrel
 #require "WS2812.class.nut:4.0.0"
@@ -54,6 +58,16 @@ spi <- hardware.spi257;
 pixels <- WS2812(spi, 5);
 ```
 
+```squirrel
+#require "WS2812.class.nut:4.0.0"
+
+// Select the SPI bus
+spi <- hardware.spiEBCA;
+
+// Instantiate RGBW array with 16 pixels
+pixels <- WS2812(spi, 16, true, true);
+```
+
 ## Class Methods
 
 ### set(*index, color*)
@@ -62,11 +76,16 @@ The `set()` method changes the color of a particular pixel in the frame buffer. 
 
 **Note** The `set()` method does not output the changes to the pixel strip. After setting up the frame, you must call `draw()` (see below) to output the frame to the strip.
 
-#### Example ####
+#### Examples ####
 
 ```squirrel
-// Set and draw a pixel
+// Set and draw an RGB pixel
 pixels.set(0, [127,0,0]).draw();
+```
+
+```squirrel
+// Set and draw an RGBW pixel
+pixels.set(0, [255,0,0,10]).draw();
 ```
 
 ### fill(*color[, start][, end]*)
@@ -78,16 +97,16 @@ The `fill()` method sets all pixels in the specified range to the desired color.
 #### Examples ####
 
 ```squirrel
-// Turn all LEDs off
+// Turn all RGB LEDs off
 pixels.fill([0,0,0]).draw();
 ```
 
 ```squirrel
-// Set half the array red
+// Set half the RGBW array red
 // and the other half blue
 pixels
-    .fill([100,0,0], 0, 2)
-    .fill([0,0,100], 3, 4)
+    .fill([255,0,0,20], 0, 2)
+    .fill([0,0,255,20], 3, 4)
     .draw();
 ```
 

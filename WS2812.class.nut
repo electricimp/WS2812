@@ -83,7 +83,7 @@ class WS2812 {
 
     // Sets a pixel in the buffer
     //   index - the index of the pixel (0 <= index < _frameSize)
-    //   color - [r,g,b] (0 <= r,g,b <= 255), or [r,g,b,a] with an alpha (RGBW)
+    //   color - [r,g,b] (0 <= r,g,b <= 255), or [r,g,b,w] with w for white (RGBW)
     //
     // NOTE: set(index, color) replaces v1.x.x's writePixel(p, color) method
     function set(index, color) {
