@@ -5,10 +5,12 @@
 
 class WS2812 {
 
-    static VERSION = "4.0.0";
+    static VERSION = "4.0.1";
 
     // Imp usage warning
     static ERROR_IMP_005 = "Use of the imp005 module with the WS2812 library is not advisable.";
+    // FROM 4.0.1
+    static ERROR_UNKNOWN_IMP = "You are using an unknown or unsupported imp type.";
 
     // This class uses SPI to emulate the WS2812s' one-wire protocol.
     // The ideal speed for WS2812 LEDs is 6400 MHz via SPI.
@@ -193,6 +195,7 @@ class WS2812 {
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 9000);
                 break;
             case 4:
+            case 6:
                 _bytesPerPixel = rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 break;
@@ -205,6 +208,10 @@ class WS2812 {
                 local actualRate = _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 // server.log(actual Rate)
                 break;
+            default:
+                // FROM 4.0.1
+                // Throw on an unknown/unsupported imp
+                throw ERROR_UNKNOWN_IMP;
         }
     }
 
