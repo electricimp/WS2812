@@ -196,6 +196,7 @@ class WS2812 {
                 break;
             case 4:
             case 6:
+                // FROM 4.0.1 -- include imp006 here (same SPI spec as imp004m)
                 _bytesPerPixel = rgbw ? BYTES_PER_PIXEL_W : BYTES_PER_PIXEL;
                 _spi.configure(MSB_FIRST | SIMPLEX_TX | NO_SCLK, 6000);
                 break;

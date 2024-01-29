@@ -9,15 +9,15 @@ Some example hardware that uses the WS2812 or WS2812B:
 * [30 LED - 1m strip](http://www.adafruit.com/products/1376)
 * [NeoPixel Stick](http://www.adafruit.com/products/1426)
 
-The library also supports RGBW NeoPixels, such as [Ultra Bright 4 Watt RGBW NeoPixel LED](https://www.adafruit.com/product/5408)
+The library also supports RGBW NeoPixels, such as [Ultra Bright 4 Watt RGBW NeoPixel LED](https://www.adafruit.com/product/5408).
 
-**To add this library to your project, add** `#require "WS2812.class.nut:4.0.0"` **to the top of your device code.**
+**To add this library to your project, add** `#require "WS2812.class.nut:4.0.1"` **to the top of your device code.**
 
 ## Hardware
 
 WS2812s require a 5V power supply and logic, and each pixel can draw up to 60mA when displaying white in full brightness, so be sure to size your power supply appropriately. Undersized power supplies (lower voltages and/or insufficient current) can cause glitches and/or failure to produce and light at all.
 
-Because WS2812s require 5V logic, you will need to shift your logic level to 5V. A sample circuit can be found below using Adafruit’s [4-channel Bi-directional Logic Level Converter](http://www.adafruit.com/products/757):
+Because WS2812s require 5V logic, you will need to shift your logic level to 5V. A sample circuit can be found below using Adafruit’s [4-channel Bi-directional Logic Level Converter](http://www.adafruit.com/products/757).
 
 ![WS2812 Circuit](./circuit.png)
 
@@ -49,7 +49,7 @@ An optional fourth parameter can be set to enable support for RGBW pixels. The d
 #### Examples ####
 
 ```squirrel
-#require "WS2812.class.nut:4.0.0"
+#require "WS2812.class.nut:4.0.1"
 
 // Select the SPI bus
 spi <- hardware.spi257;
@@ -59,7 +59,7 @@ pixels <- WS2812(spi, 5);
 ```
 
 ```squirrel
-#require "WS2812.class.nut:4.0.0"
+#require "WS2812.class.nut:4.0.1"
 
 // Select the SPI bus
 spi <- hardware.spiEBCA;
